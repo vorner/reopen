@@ -39,6 +39,10 @@
 //!     info!("Hey, it's logging");
 //! }
 //! ```
+//!
+//! Note that this solution is a bit hacky and probably solves only the most common use case.
+//!
+//! If you find another use case for it, I'd like to hear about it.
 
 extern crate libc;
 
@@ -48,6 +52,7 @@ use std::ptr;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
+/// A handle to signal a companion [`Reopen`] object to do a reopen on its next operation.
 #[derive(Clone, Debug)]
 pub struct Handle(Arc<AtomicBool>);
 
@@ -59,12 +64,27 @@ extern fn handler(_: libc::c_int, _: *mut libc::siginfo_t, _: *mut libc::c_void)
 }
 
 impl Handle {
+    /// Signals the companion [`Reopen`] object to do a reopen on its next operation.
     pub fn reopen(&self) {
         self.0.store(true, Ordering::Relaxed);
     }
+
+    /// Creates a useless handle, not paired to anything.
     pub fn stub() -> Self {
         Handle(Arc::new(AtomicBool::new(true)))
     }
+
+    #[cfg(unix)]
+    /// Installs a signal handler to invoke the reopening when a certain signal comes.
+    ///
+    /// # Notes
+    ///
+    /// * This *replaces* any other signal with the given signal number. It's not really possible
+    ///   to reopen multiple things with a single signal in this simple way. If you need that, call
+    ///   `reopen` manually.
+    /// * This may be called only before you start any additional threads ‒ best way to place it at
+    ///   the start of the `main` function. If any threads are running and accessing the reopen
+    ///   object (eg. logging), it invokes undefined behaviour.
     pub unsafe fn register_signal(&self, signal: libc::c_int) -> Result<(), Error> {
         let mut new: libc::sigaction = mem::zeroed();
         new.sa_sigaction = handler as usize;
@@ -90,6 +110,11 @@ impl Handle {
     }
 }
 
+/// A `Read`/`Write` proxy that can reopen the underlying object.
+///
+/// It is constructed with a function that can open a new instance of the object. If it is signaled
+/// to reopen it (though [`handle`](#method.handle)), it drops the old instance and uses the
+/// function to create a new one at the next IO operation.
 pub struct Reopen<FD> {
     signal: Arc<AtomicBool>,
     constructor: Box<Fn() -> Result<FD, Error> + Send>,
@@ -97,6 +122,7 @@ pub struct Reopen<FD> {
 }
 
 impl<FD> Reopen<FD> {
+    /// Creates a new instance.
     pub fn new(constructor: Box<Fn() -> Result<FD, Error> + Send>) -> Self {
         Self {
             signal: Arc::new(AtomicBool::new(true)),
@@ -104,9 +130,12 @@ impl<FD> Reopen<FD> {
             fd: None,
         }
     }
+
+    /// Returns a handle to signal this `Reopen` to perform the reopening.
     pub fn handle(&self) -> Handle {
         Handle(Arc::clone(&self.signal))
     }
+
     fn check(&mut self) -> Result<&mut FD, Error> {
         if self.signal.load(Ordering::Relaxed) {
             self.fd.take();
@@ -128,6 +157,7 @@ impl<FD: Write> Write for Reopen<FD> {
     fn write(&mut self, buf: &[u8]) -> Result<usize, Error> {
         self.check().and_then(|fd| fd.write(buf))
     }
+
     fn flush(&mut self) -> Result<(), Error> {
         self.check().and_then(Write::flush)
     }

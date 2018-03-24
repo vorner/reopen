@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/reopen/0.1.0/reopen/")]
+#![doc(html_root_url = "https://docs.rs/reopen/0.1.1/reopen/")]
 #![warn(missing_docs)]
 
 //!  A tiny `Read`/`Write` wrapper that can reopen the underlying IO object.
@@ -8,6 +8,8 @@
 //! place and creates a new empty file. However, for the new messages to appear in
 //! the new file, a running program needs to close and reopen the file. This is
 //! most often signalled by SIGHUP.
+//!
+//! # Examples
 //!
 //! This allows reopening the IO object used inside the logging drain at runtime.
 //!
@@ -70,6 +72,9 @@ impl Handle {
     }
 
     /// Creates a useless handle, not paired to anything.
+    ///
+    /// Note that this useless handle can be added to a new [`Reopen`] with the
+    /// [`with_handle`](struct.Reopen.html#method.with_handle) and becomes useful.
     pub fn stub() -> Self {
         Handle(Arc::new(AtomicBool::new(true)))
     }
@@ -124,8 +129,31 @@ pub struct Reopen<FD> {
 impl<FD> Reopen<FD> {
     /// Creates a new instance.
     pub fn new(constructor: Box<Fn() -> Result<FD, Error> + Send>) -> Self {
+        Self::with_handle(Handle::stub(), constructor)
+    }
+
+    /// Creates a new instance from the given handle.
+    ///
+    /// This might come useful if you want to create the handle beforehand with
+    /// [`Handle::stub`](struct.Handle.html#method.stub) (eg. in `lazy_static`).
+    /// Note that using the same handle for multiple `Reopen`s will not work as expected (the first
+    /// one to be used resets the signal and the others don't reopen).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use reopen::*;
+    /// // Something that implements `Write`, for example.
+    /// struct Writer;
+    ///
+    /// let handle = Handle::stub();
+    /// let reopen = Reopen::with_handle(handle.clone(), Box::new(|| Ok(Writer)));
+    ///
+    /// handle.reopen();
+    /// ```
+    pub fn with_handle(handle: Handle, constructor: Box<Fn() -> Result<FD, Error> + Send>) -> Self {
         Self {
-            signal: Arc::new(AtomicBool::new(true)),
+            signal: handle.0,
             constructor,
             fd: None,
         }
@@ -137,7 +165,7 @@ impl<FD> Reopen<FD> {
     }
 
     fn check(&mut self) -> Result<&mut FD, Error> {
-        if self.signal.load(Ordering::Relaxed) {
+        if self.signal.swap(false, Ordering::Relaxed) {
             self.fd.take();
         }
         if self.fd.is_none() {

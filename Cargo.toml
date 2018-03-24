@@ -1,0 +1,20 @@
+[package]
+name = "reopen"
+# Also increase the version in src/lib html root attribute
+version = "0.1.0"
+authors = ["Michal 'vorner' Vaner <vorner@vorner.cz>"]
+description = "File reopening utility"
+repository = "https://github.com/vorner/reopen"
+readme = "README.md"
+keywords = ["reopen", "logging"]
+categories = ["development-tools::debugging"]
+license = "Apache-2.0/MIT"
+
+[dependencies]
+libc = "~0.2"
+
+[dev-dependencies]
+log = "~0.4"
+simple-logging = "~2"
+simple-signal = "~1"
+version-sync = "~0.5"

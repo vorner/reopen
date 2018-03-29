@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/reopen/0.1.1/reopen/")]
+#![doc(html_root_url = "https://docs.rs/reopen/0.1.2/reopen/")]
 #![warn(missing_docs)]
 
 //!  A tiny `Read`/`Write` wrapper that can reopen the underlying IO object.
@@ -87,6 +87,11 @@ impl Handle {
     /// * This *replaces* any other signal with the given signal number. It's not really possible
     ///   to reopen multiple things with a single signal in this simple way. If you need that, call
     ///   `reopen` manually.
+    /// * There's only one global handle, so no matter how many signals you want to use, it still
+    ///   won't handle multiple reopen instances. If you need that, you can either handle signals
+    ///   yourself or open a pull request (I'm not against doing it properly, I just didn't need it
+    ///   yet).
+    /// * And yes, this function is an ugly hack.
     /// * This may be called only before you start any additional threads ‒ best way to place it at
     ///   the start of the `main` function. If any threads are running and accessing the reopen
     ///   object (eg. logging), it invokes undefined behaviour.

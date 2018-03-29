@@ -106,10 +106,15 @@ impl Handle {
                 libc::SA_NOCLDSTOP
         }
         new.sa_flags = flags();
+        // Insert it first, so it is ready once we install the signal handler
+        let mut original = Some(self.clone());
+        mem::swap(&mut original, &mut GLOBAL_HANDLE);
         if libc::sigaction(signal, &new, ptr::null_mut()) == 0 {
-            GLOBAL_HANDLE = Some(self.clone());
             Ok(())
         } else {
+            // Return it back to the original if the signal handler failed, whatever it was. That
+            // is not very useful likely, but probably more expected.
+            mem::swap(&mut original, &mut GLOBAL_HANDLE);
             Err(Error::last_os_error())
         }
     }

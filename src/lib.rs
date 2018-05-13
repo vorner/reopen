@@ -51,8 +51,8 @@ extern crate libc;
 use std::io::{Error, Read, Write};
 use std::mem;
 use std::ptr;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
 /// A handle to signal a companion [`Reopen`] object to do a reopen on its next operation.
 #[derive(Clone, Debug)]
@@ -60,7 +60,7 @@ pub struct Handle(Arc<AtomicBool>);
 
 static mut GLOBAL_HANDLE: Option<Handle> = None;
 
-extern fn handler(_: libc::c_int, _: *mut libc::siginfo_t, _: *mut libc::c_void) {
+extern "C" fn handler(_: libc::c_int, _: *mut libc::siginfo_t, _: *mut libc::c_void) {
     let handle = unsafe { GLOBAL_HANDLE.as_ref().unwrap().clone() };
     handle.reopen();
 }
@@ -100,15 +100,12 @@ impl Handle {
         new.sa_sigaction = handler as usize;
         #[cfg(target_os = "android")]
         fn flags() -> libc::c_ulong {
-            (libc::SA_RESTART as libc::c_ulong) |
-                libc::SA_SIGINFO |
-                (libc::SA_NOCLDSTOP as libc::c_ulong)
+            (libc::SA_RESTART as libc::c_ulong) | libc::SA_SIGINFO
+                | (libc::SA_NOCLDSTOP as libc::c_ulong)
         }
         #[cfg(not(target_os = "android"))]
         fn flags() -> libc::c_int {
-            libc::SA_RESTART |
-                libc::SA_SIGINFO |
-                libc::SA_NOCLDSTOP
+            libc::SA_RESTART | libc::SA_SIGINFO | libc::SA_NOCLDSTOP
         }
         new.sa_flags = flags();
         // Insert it first, so it is ready once we install the signal handler

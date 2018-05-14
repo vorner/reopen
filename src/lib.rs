@@ -49,7 +49,9 @@
 extern crate libc;
 
 use std::io::{Error, Read, Write};
+#[cfg(unix)]
 use std::mem;
+#[cfg(unix)]
 use std::ptr;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -60,6 +62,7 @@ pub struct Handle(Arc<AtomicBool>);
 
 static mut GLOBAL_HANDLE: Option<Handle> = None;
 
+#[cfg(unix)]
 extern "C" fn handler(_: libc::c_int, _: *mut libc::siginfo_t, _: *mut libc::c_void) {
     let handle = unsafe { GLOBAL_HANDLE.as_ref().unwrap().clone() };
     handle.reopen();

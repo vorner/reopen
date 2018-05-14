@@ -11,6 +11,11 @@ keywords = ["reopen", "logging"]
 categories = ["development-tools::debugging"]
 license = "Apache-2.0/MIT"
 
+[badges]
+maintenance = { status = "actively-developed" }
+travis-ci = { repository = "vorner/reopen" }
+appveyor = { repository = "vorner/reopen" }
+
 [dependencies]
 libc = "~0.2"
 

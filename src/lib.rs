@@ -56,7 +56,8 @@ use std::ptr;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-/// A handle to signal a companion [`Reopen`] object to do a reopen on its next operation.
+/// A handle to signal a companion [`Reopen`](struct.Reopen.html) object to do a reopen on its next
+/// operation.
 #[derive(Clone, Debug)]
 pub struct Handle(Arc<AtomicBool>);
 
@@ -69,14 +70,15 @@ extern "C" fn handler(_: libc::c_int, _: *mut libc::siginfo_t, _: *mut libc::c_v
 }
 
 impl Handle {
-    /// Signals the companion [`Reopen`] object to do a reopen on its next operation.
+    /// Signals the companion [`Reopen`](struct.Reopen.html) object to do a reopen on its next
+    /// operation.
     pub fn reopen(&self) {
         self.0.store(true, Ordering::Relaxed);
     }
 
     /// Creates a useless handle, not paired to anything.
     ///
-    /// Note that this useless handle can be added to a new [`Reopen`] with the
+    /// Note that this useless handle can be added to a new [`Reopen`](struct.Reopen.html) with the
     /// [`with_handle`](struct.Reopen.html#method.with_handle) and becomes useful.
     pub fn stub() -> Self {
         Handle(Arc::new(AtomicBool::new(true)))
@@ -145,7 +147,8 @@ impl<FD> Reopen<FD> {
     /// Creates a new instance from the given handle.
     ///
     /// This might come useful if you want to create the handle beforehand with
-    /// [`Handle::stub`](struct.Handle.html#method.stub) (eg. in `lazy_static`).
+    /// [`Handle::stub`](struct.Handle.html#method.stub) (eg. in
+    /// [`lazy_static`](https://docs.rs/lazy_static)).
     /// Note that using the same handle for multiple `Reopen`s will not work as expected (the first
     /// one to be used resets the signal and the others don't reopen).
     ///

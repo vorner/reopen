@@ -22,7 +22,7 @@ script:
       cargo test &&
       cargo doc --no-deps &&
       (test "$TRAVIS_RUST_VERSION" != nightly || cargo clippy -- --deny clippy) &&
-      (test "$TRAVIS_RUST_VERSION" != nightly || cargo fmt)
+      (test "$TRAVIS_RUST_VERSION" != nightly || cargo fmt -- --check)
 
 matrix:
     allow_failures:

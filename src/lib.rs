@@ -106,7 +106,8 @@ impl Handle {
         new.sa_sigaction = handler as usize;
         #[cfg(target_os = "android")]
         fn flags() -> libc::c_ulong {
-            (libc::SA_RESTART as libc::c_ulong) | libc::SA_SIGINFO
+            (libc::SA_RESTART as libc::c_ulong)
+                | libc::SA_SIGINFO
                 | (libc::SA_NOCLDSTOP as libc::c_ulong)
         }
         #[cfg(not(target_os = "android"))]

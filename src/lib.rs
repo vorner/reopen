@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/reopen/0.1.2/reopen/")]
+#![doc(html_root_url = "https://docs.rs/reopen/0.2.0/reopen/")]
 #![warn(missing_docs)]
 
 //!  A tiny `Read`/`Write` wrapper that can reopen the underlying IO object.

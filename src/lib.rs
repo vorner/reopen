@@ -33,12 +33,13 @@
 //!         .open("/dev/null")
 //! }
 //!
-//! fn main() {
-//!     let file = Reopen::new(Box::new(&open));
+//! fn main() -> Result<(), Error> {
+//!     let file = Reopen::new(Box::new(&open))?;
 //!     // Must be called before any threads are started
 //!     unsafe { file.handle().register_signal(libc::SIGHUP).unwrap() };
 //!     simple_logging::log_to(file, log::LevelFilter::Debug);
 //!     info!("Hey, it's logging");
+//!     Ok(())
 //! }
 //! ```
 //!
@@ -132,6 +133,16 @@ impl Handle {
 /// It is constructed with a function that can open a new instance of the object. If it is signaled
 /// to reopen it (though [`handle`](#method.handle)), it drops the old instance and uses the
 /// function to create a new one at the next IO operation.
+///
+/// # Error handling
+///
+/// The reopening is performed lazily, on the first operation done to the object. Opening a new
+/// instance can fail with an error. If this happens, the error is returned as part of the
+/// operation being performed ‒ therefore, you can get an error like `File not found` while
+/// performing `read`.
+///
+/// If an error happens, the operation is aborted. Next time an operation is performed, another
+/// attempt to open the object is made (which in turn can fail again).
 pub struct Reopen<FD> {
     signal: Arc<AtomicBool>,
     constructor: Box<Fn() -> Result<FD, Error> + Send>,
@@ -140,7 +151,7 @@ pub struct Reopen<FD> {
 
 impl<FD> Reopen<FD> {
     /// Creates a new instance.
-    pub fn new(constructor: Box<Fn() -> Result<FD, Error> + Send>) -> Self {
+    pub fn new(constructor: Box<Fn() -> Result<FD, Error> + Send>) -> Result<Self, Error> {
         Self::with_handle(Handle::stub(), constructor)
     }
 
@@ -164,12 +175,16 @@ impl<FD> Reopen<FD> {
     ///
     /// handle.reopen();
     /// ```
-    pub fn with_handle(handle: Handle, constructor: Box<Fn() -> Result<FD, Error> + Send>) -> Self {
-        Self {
+    pub fn with_handle(
+        handle: Handle,
+        constructor: Box<Fn() -> Result<FD, Error> + Send>,
+    ) -> Result<Self, Error> {
+        let fd = constructor()?;
+        Ok(Self {
             signal: handle.0,
             constructor,
-            fd: None,
-        }
+            fd: Some(fd),
+        })
     }
 
     /// Returns a handle to signal this `Reopen` to perform the reopening.

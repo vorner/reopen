@@ -16,7 +16,8 @@ maintenance = { status = "actively-developed" }
 travis-ci = { repository = "vorner/reopen" }
 appveyor = { repository = "vorner/reopen" }
 
-[dependencies]
+[target.'cfg(unix)'.dependencies]
+arc-swap = "~0.1"
 libc = "~0.2"
 
 [dev-dependencies]

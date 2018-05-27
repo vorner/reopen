@@ -47,8 +47,6 @@
 //!
 //! If you find another use case for it, I'd like to hear about it.
 
-extern crate libc;
-
 use std::io::{Error, Read, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -109,6 +107,7 @@ impl<FD> Reopen<FD> {
     /// This might come useful if you want to create the handle beforehand with
     /// [`Handle::stub`](struct.Handle.html#method.stub) (eg. in
     /// [`lazy_static`](https://docs.rs/lazy_static)).
+    ///
     /// Note that using the same handle for multiple `Reopen`s will not work as expected (the first
     /// one to be used resets the signal and the others don't reopen).
     ///

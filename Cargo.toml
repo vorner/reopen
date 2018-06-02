@@ -23,5 +23,4 @@ libc = "~0.2"
 [dev-dependencies]
 log = "~0.4"
 simple-logging = "~2"
-simple-signal = "~1"
 version-sync = "~0.5"

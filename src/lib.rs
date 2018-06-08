@@ -35,8 +35,7 @@
 //!
 //! fn main() -> Result<(), Error> {
 //!     let file = Reopen::new(Box::new(&open))?;
-//!     // Must be called before any threads are started
-//!     unsafe { file.handle().register_signal(libc::SIGHUP).unwrap() };
+//!     file.handle().register_signal(libc::SIGHUP).unwrap();
 //!     simple_logging::log_to(file, log::LevelFilter::Debug);
 //!     info!("Hey, it's logging");
 //!     Ok(())

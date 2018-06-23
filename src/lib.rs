@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/reopen/0.2.2/reopen/")]
+#![doc(html_root_url = "https://docs.rs/reopen/0.3.0/reopen/")]
 #![warn(missing_docs)]
 
 //!  A tiny `Read`/`Write` wrapper that can reopen the underlying IO object.
@@ -70,7 +70,7 @@ impl Handle {
     /// Note that this useless handle can be added to a new [`Reopen`](struct.Reopen.html) with the
     /// [`with_handle`](struct.Reopen.html#method.with_handle) and becomes useful.
     pub fn stub() -> Self {
-        Handle(Arc::new(AtomicBool::new(true)))
+        Handle(Arc::new(AtomicBool::new(false)))
     }
 }
 

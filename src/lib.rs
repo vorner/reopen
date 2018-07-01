@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/reopen/0.3.0/reopen/")]
+#![doc(html_root_url = "https://docs.rs/reopen/0.3.0/reopen/", test(attr(deny(warnings))))]
 #![warn(missing_docs)]
 
 //!  A tiny `Read`/`Write` wrapper that can reopen the underlying IO object.
@@ -121,6 +121,7 @@ impl<FD> Reopen<FD> {
     /// let reopen = Reopen::with_handle(handle.clone(), Box::new(|| Ok(Writer)));
     ///
     /// handle.reopen();
+    /// # let _ = reopen;
     /// ```
     pub fn with_handle(
         handle: Handle,

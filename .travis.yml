@@ -4,26 +4,15 @@ rust:
     - stable
     - beta
     - nightly
+    - 1.31.0
 os:
     - linux
     - osx
 
 before_script:
     - |
-      (travis_wait rustup component add rustfmt-preview || true) &&
-      (test "$TRAVIS_RUST_VERSION" != nightly || travis_wait cargo install --force clippy || true)
+      (travis_wait rustup component add rustfmt || true) &&
+      (travis_wait rustup component add clippy || true)
 
 script:
-    - |
-      export PATH="$PATH":~/.cargo/bin &&
-      export RUST_BACKTRACE=1 &&
-      export CARGO_INCREMENTAL=1 &&
-      cargo build &&
-      cargo test &&
-      cargo doc --no-deps &&
-      (test "$TRAVIS_RUST_VERSION" != nightly || cargo clippy -- --deny clippy) &&
-      (test "$TRAVIS_RUST_VERSION" != nightly || cargo fmt -- --check)
-
-matrix:
-    allow_failures:
-        - rust: nightly
+    - ./ci-check.sh

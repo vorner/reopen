@@ -1,10 +1,7 @@
-extern crate libc;
-extern crate signal_hook;
-
 use std::io::Error;
 use std::sync::Arc;
 
-use self::signal_hook::SigId;
+use signal_hook::SigId;
 
 use super::Handle;
 
@@ -53,10 +50,11 @@ mod tests {
     fn signal_sent() {
         let opened_times = Arc::new(AtomicUsize::new(0));
         let opened_times_cp = Arc::clone(&opened_times);
-        let mut reopen = ::Reopen::new(Box::new(move || {
+        let mut reopen = crate::Reopen::new(Box::new(move || {
             opened_times_cp.fetch_add(1, Ordering::Relaxed);
             Ok(Fake(Arc::clone(&opened_times_cp)))
-        })).unwrap();
+        }))
+        .unwrap();
         assert_eq!(1, opened_times.load(Ordering::Relaxed));
         let mut buf = [0];
         assert_eq!(0, reopen.read(&mut buf).unwrap());

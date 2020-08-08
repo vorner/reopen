@@ -1,4 +1,7 @@
-#![doc(html_root_url = "https://docs.rs/reopen/0.3.0/reopen/", test(attr(deny(warnings))))]
+#![doc(
+    html_root_url = "https://docs.rs/reopen/0.3.0/reopen/",
+    test(attr(deny(warnings)))
+)]
 #![warn(missing_docs)]
 
 //!  A tiny `Read`/`Write` wrapper that can reopen the underlying IO object.
@@ -14,15 +17,10 @@
 //! This allows reopening the IO object used inside the logging drain at runtime.
 //!
 //! ```rust
-//! extern crate libc;
-//! #[macro_use]
-//! extern crate log;
-//! extern crate reopen;
-//! extern crate simple_logging;
-//!
 //! use std::fs::{File, OpenOptions};
 //! use std::io::Error;
 //!
+//! use log::info;
 //! use reopen::Reopen;
 //!
 //! fn open() -> Result<File, Error> {
@@ -91,13 +89,13 @@ impl Handle {
 /// attempt to open the object is made (which in turn can fail again).
 pub struct Reopen<FD> {
     signal: Arc<AtomicBool>,
-    constructor: Box<Fn() -> Result<FD, Error> + Send>,
+    constructor: Box<dyn Fn() -> Result<FD, Error> + Send>,
     fd: Option<FD>,
 }
 
 impl<FD> Reopen<FD> {
     /// Creates a new instance.
-    pub fn new(constructor: Box<Fn() -> Result<FD, Error> + Send>) -> Result<Self, Error> {
+    pub fn new(constructor: Box<dyn Fn() -> Result<FD, Error> + Send>) -> Result<Self, Error> {
         Self::with_handle(Handle::stub(), constructor)
     }
 
@@ -125,7 +123,7 @@ impl<FD> Reopen<FD> {
     /// ```
     pub fn with_handle(
         handle: Handle,
-        constructor: Box<Fn() -> Result<FD, Error> + Send>,
+        constructor: Box<dyn Fn() -> Result<FD, Error> + Send>,
     ) -> Result<Self, Error> {
         let fd = constructor()?;
         Ok(Self {

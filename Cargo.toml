@@ -10,6 +10,7 @@ readme = "README.md"
 keywords = ["reopen", "logging"]
 categories = ["development-tools::debugging"]
 license = "Apache-2.0/MIT"
+edition = "2018"
 
 [badges]
 maintenance = { status = "actively-developed" }
@@ -23,4 +24,4 @@ signal-hook = "~0.1"
 [dev-dependencies]
 log = "~0.4"
 simple-logging = "~2"
-version-sync = "~0.5"
+version-sync = "~0.9"

@@ -118,3 +118,4 @@ build: false
 # requests to disable them only selectively are welcome.
 test_script:
   - cargo build --verbose %cargoflags%
+  - cargo test --all --all-features

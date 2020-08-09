@@ -8,6 +8,10 @@ use super::Handle;
 impl Handle {
     /// Installs a signal handler to invoke the reopening when a certain signal comes.
     ///
+    /// # Features
+    ///
+    /// This is available only with the `signals` feature enabled.
+    ///
     /// # Notes
     ///
     /// * Under the hood, this uses the [`signal-hook`](https://crates.io/signal-hook) crate, so

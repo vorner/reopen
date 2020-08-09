@@ -10,7 +10,12 @@
 //! logrotate wants to rotate log files, it moves the current log file to a new
 //! place and creates a new empty file. However, for the new messages to appear in
 //! the new file, a running program needs to close and reopen the file. This is
-//! most often signalled by SIGHUP.
+//! most often signalled by `SIGHUP`.
+//!
+//! # Features
+//!
+//! The `signals` feature adds support to registering a reopening as a result of received a signal
+//! (for example the `SIGHUP` one).
 //!
 //! # Examples
 //!
@@ -48,7 +53,7 @@ use std::io::{Error, Read, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-#[cfg(unix)]
+#[cfg(feature = "signals")]
 mod signals;
 
 /// A handle to signal a companion [`Reopen`](struct.Reopen.html) object to do a reopen on its next

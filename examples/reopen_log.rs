@@ -11,6 +11,10 @@
 //! * See that the file is still growing, even when under different name.
 //! * Send `SIGHUP` to the program (`killall -SIGHUP reopen_log`).
 //! * See `log2.txt` no longer grows, new `log.txt` appeared and grows.
+//!
+//! # Features
+//!
+//! This relies on the `signals` feature.
 
 use std::fs::File;
 use std::io::{Error, Write};

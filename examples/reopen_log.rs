@@ -1,3 +1,4 @@
+
 //! Example of reopening log file on SIGHUP
 //!
 //! This program keeps writing messages into a file `log.txt`. If it receives SIGHUP, it reopens
@@ -16,6 +17,9 @@
 //!
 //! This relies on the `signals` feature.
 
+#[cfg(feature = "signals")]
+mod example {
+
 use std::fs::File;
 use std::io::{Error, Write};
 use std::path::Path;
@@ -23,6 +27,8 @@ use std::thread;
 use std::time::Duration;
 
 use reopen::Reopen;
+
+use signal_hook::SIGHUP;
 
 /// Keeps writing into the given file (or, `Write`), one line per second.
 fn log_forever<W: Write>(mut w: W) -> Result<(), Error> {
@@ -39,11 +45,25 @@ fn open_log<P: AsRef<Path>>(p: P) -> Result<File, Error> {
     File::create(p)
 }
 
-fn main() -> Result<(), Error> {
+pub fn main() -> Result<(), Error> {
     // Create a proxy to the file
     let log = Reopen::new(Box::new(|| open_log("log.txt")))?;
     // Make sure it gets reopened on SIGHUP
     log.handle().register_signal(libc::SIGHUP)?;
     // Pass it to the logging facility
     log_forever(log)
+}
+
+}
+
+// Version just to make compiler happy if features are not turned on
+#[cfg(not(feature = "signals"))]
+mod example {
+pub fn main() -> Result<(), std::io::Error> {
+    Ok(())
+}
+}
+
+fn main() -> Result<(), std::io::Error> {
+    example::main()
 }

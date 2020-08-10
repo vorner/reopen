@@ -38,7 +38,8 @@
 //!
 //! fn main() -> Result<(), Error> {
 //!     let file = Reopen::new(Box::new(&open))?;
-//!     file.handle().register_signal(libc::SIGHUP).unwrap();
+//! # #[cfg(feature = "signals")]
+//!     file.handle().register_signal(signal_hook::SIGHUP)?;
 //!     simple_logging::log_to(file, log::LevelFilter::Debug);
 //!     info!("Hey, it's logging");
 //!     Ok(())

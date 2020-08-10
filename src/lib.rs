@@ -12,6 +12,13 @@
 //! the new file, a running program needs to close and reopen the file. This is
 //! most often signalled by `SIGHUP`.
 //!
+//! # Traits
+//!
+//! The amount of supported traits is somewhat limited. For example, [BufRead][std::io::BufRead] or
+//! [Seek][std::io::Seek] are not implemented, because the behavior across reopens would be
+//! confusing if not outright wrong (even behaviour of methods like
+//! [write_all][std::io::Write::write_all] might behave a bit strange).
+//!
 //! # Features
 //!
 //! The `signals` feature adds support to registering a reopening as a result of received a signal
@@ -50,6 +57,7 @@
 //!
 //! If you find another use case for it, I'd like to hear about it.
 
+use std::fmt::{Debug, Formatter, Result as FmtResult};
 use std::io::{Error, Read, Write};
 #[cfg(vectored)]
 use std::io::{IoSlice, IoSliceMut};
@@ -154,6 +162,16 @@ impl<FD> Reopen<FD> {
             self.fd = Some((self.constructor)()?);
         }
         Ok(self.fd.as_mut().unwrap())
+    }
+}
+
+impl<FD: Debug> Debug for Reopen<FD> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        f.debug_struct("Reopen")
+            .field("signal", &self.signal)
+            .field("fd", &self.fd)
+            .field("constructor", &"...")
+            .finish()
     }
 }
 

@@ -1,3 +1,4 @@
+* Reopen implements Debug
 * `read_vectored` and `write_vectored` support where already provided by `std`
 * The signal support is enabled by a feature (default off)
   - Windows now has it too

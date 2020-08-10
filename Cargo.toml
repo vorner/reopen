@@ -24,6 +24,9 @@ appveyor = { repository = "vorner/reopen" }
 libc = { version = "~0.2", optional = true }
 signal-hook = { version = "~0.1", optional = true }
 
+[build-dependencies]
+autocfg = "~1"
+
 [dev-dependencies]
 log = "~0.4"
 simple-logging = "~2"

@@ -51,6 +51,8 @@
 //! If you find another use case for it, I'd like to hear about it.
 
 use std::io::{Error, Read, Write};
+#[cfg(vectored)]
+use std::io::{IoSlice, IoSliceMut};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
@@ -159,6 +161,11 @@ impl<FD: Read> Read for Reopen<FD> {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, Error> {
         self.check().and_then(|fd| fd.read(buf))
     }
+
+    #[cfg(vectored)]
+    fn read_vectored(&mut self, bufs: &mut [IoSliceMut<'_>]) -> Result<usize, Error> {
+        self.check().and_then(|fd| fd.read_vectored(bufs))
+    }
 }
 
 impl<FD: Write> Write for Reopen<FD> {
@@ -168,5 +175,10 @@ impl<FD: Write> Write for Reopen<FD> {
 
     fn flush(&mut self) -> Result<(), Error> {
         self.check().and_then(Write::flush)
+    }
+
+    #[cfg(vectored)]
+    fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> Result<usize, Error> {
+        self.check().and_then(|fd| fd.write_vectored(bufs))
     }
 }

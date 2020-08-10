@@ -28,6 +28,9 @@ use std::time::Duration;
 
 use reopen::Reopen;
 
+#[cfg(windows)] // Windows has a very limited set of signals, but make it compile at least :-(
+use signal_hook::SIGINT as SIGHUP;
+#[cfg(not(windows))]
 use signal_hook::SIGHUP;
 
 /// Keeps writing into the given file (or, `Write`), one line per second.
@@ -49,7 +52,7 @@ pub fn main() -> Result<(), Error> {
     // Create a proxy to the file
     let log = Reopen::new(Box::new(|| open_log("log.txt")))?;
     // Make sure it gets reopened on SIGHUP
-    log.handle().register_signal(libc::SIGHUP)?;
+    log.handle().register_signal(SIGHUP)?;
     // Pass it to the logging facility
     log_forever(log)
 }

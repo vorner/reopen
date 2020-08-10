@@ -33,7 +33,7 @@ impl Handle {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, not(windows)))] // Not testing on windows, very limited signal support
 mod tests {
     use std::io::Read;
     use std::sync::atomic::{AtomicUsize, Ordering};

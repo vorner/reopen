@@ -21,7 +21,7 @@
 //!
 //! This allows reopening the IO object used inside the logging drain at runtime.
 //!
-//! ```rust
+//! ```rust,no_run
 //! use std::fs::{File, OpenOptions};
 //! use std::io::Error;
 //!
@@ -33,12 +33,12 @@
 //!         .create(true)
 //!         .write(true)
 //!         .append(true)
-//!         .open("/dev/null")
+//!         .open("/log/file")
 //! }
 //!
 //! fn main() -> Result<(), Error> {
 //!     let file = Reopen::new(Box::new(&open))?;
-//! # #[cfg(feature = "signals")]
+//! # #[cfg(all(feature = "signals", not(windows)))]
 //!     file.handle().register_signal(signal_hook::SIGHUP)?;
 //!     simple_logging::log_to(file, log::LevelFilter::Debug);
 //!     info!("Hey, it's logging");

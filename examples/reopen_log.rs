@@ -1,4 +1,3 @@
-
 //! Example of reopening log file on SIGHUP
 //!
 //! This program keeps writing messages into a file `log.txt`. If it receives SIGHUP, it reopens
@@ -18,6 +17,7 @@
 //! This relies on the `signals` feature.
 
 #[cfg(feature = "signals")]
+#[rustfmt::skip]
 mod example {
 
 use std::fs::File;
@@ -61,6 +61,7 @@ pub fn main() -> Result<(), Error> {
 
 // Version just to make compiler happy if features are not turned on
 #[cfg(not(feature = "signals"))]
+#[rustfmt::skip]
 mod example {
 pub fn main() -> Result<(), std::io::Error> {
     Ok(())

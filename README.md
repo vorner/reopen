@@ -1,7 +1,6 @@
 # Reopen
 
 [![Travis Build Status](https://api.travis-ci.org/vorner/reopen.png?branch=master)](https://travis-ci.org/vorner/reopen)
-[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/956fq0suxa0x5afi/branch/master?svg=true)](https://ci.appveyor.com/project/vorner/reopen/branch/master)
 
 A tiny `Read`/`Write` wrapper that can reopen the underlying IO object.
 

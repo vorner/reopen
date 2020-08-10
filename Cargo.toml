@@ -18,7 +18,6 @@ signals = ["signal-hook"]
 [badges]
 maintenance = { status = "actively-developed" }
 travis-ci = { repository = "vorner/reopen" }
-appveyor = { repository = "vorner/reopen" }
 
 [dependencies]
 libc = { version = "~0.2", optional = true }

@@ -1,3 +1,5 @@
+* The signal support is enabled by a feature (default off)
+  - Windows now has it too
 * Migrated to edition 2018, fixed the low Rust version to 1.31.0
 
 # 0.3.0

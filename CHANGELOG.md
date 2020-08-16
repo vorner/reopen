@@ -1,3 +1,4 @@
+* Allow user code to lock against reopening for a while.
 * Don't interrupt bulk operations (`write_all`, `read_to_string`) by reopening,
   check reopening only once before they start.
 * Reopen implements Debug

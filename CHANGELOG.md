@@ -1,3 +1,5 @@
+* Don't interrupt bulk operations (`write_all`, `read_to_string`) by reopening,
+  check reopening only once before they start.
 * Reopen implements Debug
 * `read_vectored` and `write_vectored` support where already provided by `std`
 * The signal support is enabled by a feature (default off)

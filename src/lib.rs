@@ -57,7 +57,7 @@
 //!
 //! If you find another use case for it, I'd like to hear about it.
 
-use std::fmt::{Debug, Formatter, Result as FmtResult};
+use std::fmt::{self, Debug, Formatter, Result as FmtResult};
 use std::io::{Error, Read, Write};
 #[cfg(vectored)]
 use std::io::{IoSlice, IoSliceMut};
@@ -103,6 +103,23 @@ impl Handle {
 ///
 /// If an error happens, the operation is aborted. Next time an operation is performed, another
 /// attempt to open the object is made (which in turn can fail again).
+///
+/// # Scheduling of a reopen
+///
+/// The implementation tries to ensure whole operations happen on the same FD. For example, even if
+/// multiple [`read`][Read::read] calls need to be performed as part of
+/// [`read_exact`][Read::read_exact], the [`Reopen`] will check for reopening flags only once
+/// before the whole operation and then will keep the same FD.
+///
+/// # Handling of ends
+///
+/// Certain operations make ordinary file descriptors „finished“ ‒ for example,
+/// [`read_to_end`][Read::read_to_end]. Usually, further calls to any read operations would produce
+/// EOF from then on.
+///
+/// While this reaches the end of the currently opened FD and further read operations would still
+/// produce EOF, reopening the FD may lead to it being readable again. Therefore, reaching EOF is
+/// not necessarily final for [`Reopen`].
 pub struct Reopen<FD> {
     signal: Arc<AtomicBool>,
     constructor: Box<dyn Fn() -> Result<FD, Error> + Send>,
@@ -177,26 +194,56 @@ impl<FD: Debug> Debug for Reopen<FD> {
 
 impl<FD: Read> Read for Reopen<FD> {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, Error> {
-        self.check().and_then(|fd| fd.read(buf))
+        let fd = self.check()?;
+        fd.read(buf)
+    }
+
+    fn read_exact(&mut self, buf: &mut [u8]) -> Result<(), Error> {
+        let fd = self.check()?;
+        fd.read_exact(buf)
+    }
+
+    fn read_to_end(&mut self, buf: &mut Vec<u8>) -> Result<usize, Error> {
+        let fd = self.check()?;
+        fd.read_to_end(buf)
+    }
+
+    fn read_to_string(&mut self, buf: &mut String) -> Result<usize, Error> {
+        let fd = self.check()?;
+        fd.read_to_string(buf)
     }
 
     #[cfg(vectored)]
     fn read_vectored(&mut self, bufs: &mut [IoSliceMut<'_>]) -> Result<usize, Error> {
-        self.check().and_then(|fd| fd.read_vectored(bufs))
+        let fd = self.check()?;
+        fd.read_vectored(bufs)
     }
 }
 
 impl<FD: Write> Write for Reopen<FD> {
-    fn write(&mut self, buf: &[u8]) -> Result<usize, Error> {
-        self.check().and_then(|fd| fd.write(buf))
+    fn flush(&mut self) -> Result<(), Error> {
+        let fd = self.check()?;
+        fd.flush()
     }
 
-    fn flush(&mut self) -> Result<(), Error> {
-        self.check().and_then(Write::flush)
+    fn write(&mut self, buf: &[u8]) -> Result<usize, Error> {
+        let fd = self.check()?;
+        fd.write(buf)
+    }
+
+    fn write_all(&mut self, buf: &[u8]) -> Result<(), Error> {
+        let fd = self.check()?;
+        fd.write_all(buf)
+    }
+
+    fn write_fmt(&mut self, fmt: fmt::Arguments<'_>) -> Result<(), Error> {
+        let fd = self.check()?;
+        fd.write_fmt(fmt)
     }
 
     #[cfg(vectored)]
     fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> Result<usize, Error> {
-        self.check().and_then(|fd| fd.write_vectored(bufs))
+        let fd = self.check()?;
+        fd.write_vectored(bufs)
     }
 }

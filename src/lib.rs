@@ -119,7 +119,7 @@ impl<FD> Reopen<FD> {
     ///
     /// This might come useful if you want to create the handle beforehand with
     /// [`Handle::stub`](struct.Handle.html#method.stub) (eg. in
-    /// [`lazy_static`](https://docs.rs/lazy_static)).
+    /// [`once_cell`](https://docs.rs/once_cell)).
     ///
     /// Note that using the same handle for multiple `Reopen`s will not work as expected (the first
     /// one to be used resets the signal and the others don't reopen).

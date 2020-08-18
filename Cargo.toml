@@ -29,6 +29,7 @@ autocfg = "~1"
 [dev-dependencies]
 log = "~0.4"
 simple-logging = "~2"
+partial-io = "~0.3"
 version-sync = "~0.9"
 
 [package.metadata.docs.rs]

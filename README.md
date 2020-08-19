@@ -14,6 +14,25 @@ This allows reopening the IO object used inside the logging drain at runtime.
 
 An example is in the [documentation](https://docs.rs/reopen).
 
+## Future plans
+
+The API feels feature complete to me, therefore there probably won't be much
+happening here. But I'm still open to ideas what would be good to have or PRs
+implementing it.
+
+## Rustc version policy
+
+The project will build on any rustc 1.31.0 or newer. The only exception is
+feature flags added in the future, where enabling them might require newer
+compiler.
+
+The tests or examples don't have any particular version guarantee (future
+versions of the project may only *build* on 1.31.0, but tests might require
+never compiler).
+
+Change to this policy would be considered an API breaking change and would
+require bumping the version to 2.0.
+
 ## License
 
 Licensed under either of

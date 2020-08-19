@@ -18,8 +18,7 @@
 //!
 //! The amount of supported traits is somewhat limited. For example, [BufRead][std::io::BufRead] or
 //! [Seek][std::io::Seek] are not implemented, because the behavior across reopens would be
-//! confusing if not outright wrong (even behaviour of methods like
-//! [write_all][std::io::Write::write_all] might behave a bit strange).
+//! confusing if not outright wrong.
 //!
 //! # Features
 //!
@@ -69,8 +68,10 @@ use std::sync::Arc;
 #[cfg(feature = "signals")]
 mod signals;
 
-/// A handle to signal a companion [`Reopen`](struct.Reopen.html) object to do a reopen on its next
-/// operation.
+/// A handle to signal a companion [`Reopen`] object to do a reopen on its next operation.
+///
+/// Cloning creates interchangeable handles (they all control the same [`Reopen`]). Cloning is
+/// cheap (it's only an [`Arc`] in disguise).
 #[derive(Clone, Debug)]
 pub struct Handle(Arc<AtomicBool>);
 
@@ -81,10 +82,9 @@ impl Handle {
         self.0.store(true, Ordering::Relaxed);
     }
 
-    /// Creates a useless handle, not paired to anything.
+    /// Creates an unpaired handle, not connected to any ['Reopen'].
     ///
-    /// Note that this useless handle can be added to a new [`Reopen`](struct.Reopen.html) with the
-    /// [`with_handle`](struct.Reopen.html#method.with_handle) and becomes useful.
+    /// It can be added to a new [`Reopen`] later on with [`with_handle`][Reopen::with_handle].
     pub fn stub() -> Self {
         Handle(Arc::new(AtomicBool::new(false)))
     }

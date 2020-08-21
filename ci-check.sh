@@ -32,4 +32,4 @@ if [ "$TRAVIS_RUST_VERSION" = nightly ] ; then
 fi
 
 cargo clippy --all --tests -- --deny clippy::all
-cargo fmt
+cargo fmt -- --check

@@ -1,7 +1,4 @@
-#![doc(
-    html_root_url = "https://docs.rs/reopen/1.0.1/reopen/",
-    test(attr(deny(warnings)))
-)]
+#![doc(test(attr(deny(warnings))))]
 #![warn(missing_docs)]
 // Forbid unsafe code in the actual code, but tests use libc::kill.
 #![cfg_attr(not(test), forbid(unsafe_code))]

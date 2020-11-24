@@ -1,6 +1,8 @@
 # Reopen
 
-[![Travis Build Status](https://api.travis-ci.org/vorner/reopen.png?branch=master)](https://travis-ci.org/vorner/reopen)
+[![Actions Status](https://github.com/vorner/reopen/workflows/test/badge.svg)](https://github.com/vorner/reopen/actions)
+[![codecov](https://codecov.io/gh/vorner/reopen/branch/master/graph/badge.svg?token=3KA3R2D9fV)](https://codecov.io/gh/vorner/reopen)
+[![docs](https://docs.rs/reopen/badge.svg)](https://docs.rs/reopen)
 
 A tiny `Read`/`Write` wrapper that can reopen the underlying IO object.
 

@@ -1,3 +1,10 @@
+# 1.0.2
+
+* Update signal-hook dependency to 0.2.
+  Note: this is *not* breaking change. While we do re-export the `SigId`, that
+  one comes from `signal-hook-registry`, which is already 1.0. So it is the same
+  type.
+
 # 1.0.1
 
 * Fix feature specification, so the `signals` feature compiles.

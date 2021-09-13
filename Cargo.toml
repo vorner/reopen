@@ -23,7 +23,7 @@ travis-ci = { repository = "vorner/reopen" }
 
 [dependencies]
 libc = { version = "~0.2", optional = true }
-signal-hook = { version = "~0.2", optional = true, default-features = false }
+signal-hook = { version = "~0.3", optional = true, default-features = false }
 
 [build-dependencies]
 autocfg = "~1"

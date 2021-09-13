@@ -29,9 +29,9 @@ use std::time::Duration;
 use reopen::Reopen;
 
 #[cfg(windows)] // Windows has a very limited set of signals, but make it compile at least :-(
-use signal_hook::SIGINT as SIGHUP;
+use signal_hook::consts::SIGINT as SIGHUP;
 #[cfg(not(windows))]
-use signal_hook::SIGHUP;
+use signal_hook::consts::SIGHUP;
 
 /// Keeps writing into the given file (or, `Write`), one line per second.
 fn log_forever<W: Write>(mut w: W) -> Result<(), Error> {

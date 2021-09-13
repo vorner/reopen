@@ -44,7 +44,7 @@
 //! fn main() -> Result<(), Error> {
 //!     let file = Reopen::new(Box::new(&open))?;
 //! # #[cfg(all(feature = "signals", not(windows)))]
-//!     file.handle().register_signal(signal_hook::SIGHUP)?;
+//!     file.handle().register_signal(signal_hook::consts::SIGHUP)?;
 //!     simple_logging::log_to(file, log::LevelFilter::Debug);
 //!     info!("Hey, it's logging");
 //!     Ok(())

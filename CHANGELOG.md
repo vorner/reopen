@@ -1,3 +1,7 @@
+# 1.0.3
+
+* Update signal-hook dependency to 0.3.
+
 # 1.0.2
 
 * Update signal-hook dependency to 0.2.
